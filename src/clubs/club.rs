@@ -1,7 +1,9 @@
+use std::collections::{HashSet, VecDeque};
+
 pub struct Club {
-    pub id: u64, //random, static id
-    pub created: u64, //created seconds since unix epoch
-    pub age: u64, //seconds since unix epoch
-    pub name: String, //changeable name
-    pub owners: Vec<u64>,
+    pub id: u64,
+    pub created: u64,
+    pub name: String,
+    pub owner_id: HashSet<u64>,
+    pub member_ids: HashSet<u64>,
 }

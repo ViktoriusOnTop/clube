@@ -4,3 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+opaque-ke = { version = "4.0.1", features = ["argon2", "ristretto255"] }
+sha2 = "=0.10.9"
+digest = "=0.10.7"

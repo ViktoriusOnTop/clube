@@ -7,8 +7,3 @@ edition = "2024"
 opaque-ke = { version = "4.0.1", features = ["argon2", "ristretto255"] }
 sha2 = "=0.10.9"
 digest = "=0.10.7"
-heed = "0.23.1"
-home = "0.5.12"
-anyhow = "1.0.104"
-serde = "1.0.229"
-bincode = "1.3.3"

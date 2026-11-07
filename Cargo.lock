@@ -512,10 +512,12 @@ name = "kanjclubs"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "bincode",
  "digest",
  "heed",
  "home",
  "opaque-ke",
+ "serde",
  "sha2",
 ]
 

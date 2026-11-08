@@ -6,8 +6,8 @@ use std::fs;
 use std::path::PathBuf;
 
 pub struct AccountsDB {
-    env: Env,
-    db: Database<'static, U64<BigEndian>, Account>
+    pub(crate) env: Env,
+    pub(crate) db: Database<'static, U64<BigEndian>, Account>
 }
 
 fn get_db_dir() -> PathBuf {
@@ -45,17 +45,11 @@ impl AccountsDB {
         let mut wtxn = self.env.write_txn()?;
 
         let explicit_id = account.id.is_some();
-        let id = match account.id {
-            Some(id) => id,
-            None => self.db.last(&wtxn)?.map_or(0, |(last_id, _)| last_id + 1),
-        };
+        let id = self.db.last(&wtxn)?.map_or(0, |(last_id, _)| last_id + 1);
 
         let account = account.into_account(id);
-        if explicit_id {
-            self.db.put_with_flags(&mut wtxn, PutFlags::NO_OVERWRITE, &id, &account)?;
-        } else {
-            self.db.put(&mut wtxn, &id, &account)?;
-        }
+
+        self.db.put(&mut wtxn, &id, &account)?;
 
         wtxn.commit()?;
         Ok(id)

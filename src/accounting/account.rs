@@ -4,6 +4,7 @@ use opaque_ke::{ServerRegistration, ciphersuite::CipherSuite};
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
 use std::collections::HashSet;
+use tokio::time::Instant;
 
 pub struct DefaultCipherSuite;
 
@@ -52,9 +53,6 @@ pub struct EmailID{
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AccountCreation {
-    pub id: Option<u64>,
-    pub created_at: u64, //generic info
-    pub updated_at: u64, //either updated or created at time
     pub last_login_at: Option<u64>,
 
     pub display_name: String, //name
@@ -77,12 +75,12 @@ pub struct AccountCreation {
     pub owned_clubs_ids: HashSet<u64>,
 }
 
-
 impl BytesEncode<'_> for Account {
     type EItem = Self;
 
     fn bytes_encode(item: &Self::EItem) -> Result<Cow<'_, [u8]>, Box<dyn std::error::Error + Send + Sync>> {
-        let bytes = bincode::serialize(item)?;
+        let config = bincode::config::standard();
+        let bytes = bincode::serde::encode_to_vec(item, config)?;
         Ok(Cow::Owned(bytes))
     }
 }
@@ -91,17 +89,23 @@ impl<'a> BytesDecode<'a> for Account {
     type DItem = Self;
 
     fn bytes_decode(bytes: &'a [u8]) -> Result<Self::DItem, Box<dyn std::error::Error + Send + Sync>> {
-        let account = bincode::deserialize(bytes)?;
+        // Modern bincode 2.0 implementation
+        let config = bincode::config::standard();
+        let (account, _) = bincode::serde::decode_from_slice(bytes, config)?;
         Ok(account)
     }
 }
 
 impl AccountCreation {
     pub fn into_account(self, id: u64) -> Account{
+        let now = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_secs();
         let account = Account {
             id,
-            created_at: self.created_at,
-            updated_at: self.updated_at,
+            created_at: now,
+            updated_at: now,
             last_login_at: self.last_login_at,
             display_name: self.display_name,
             username: self.username,

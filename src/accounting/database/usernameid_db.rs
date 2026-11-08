@@ -5,8 +5,8 @@ use std::fs;
 use std::path::PathBuf;
 
 pub struct UsernameIdDB {
-    env: Env,
-    db: Database<'static, Str, U64<BigEndian>>,
+    pub(crate) env: Env,
+    pub(crate) db: Database<'static, Str, U64<BigEndian>>,
 }
 
 fn get_db_dir() -> PathBuf {
@@ -42,14 +42,14 @@ impl UsernameIdDB {
         Ok(Self { env, db })
     }
 
-    pub fn insert(&self, username: &str, id: u64) -> heed::Result<()> {
+    pub fn insert_usernameid(&self, username: &str, id: u64) -> heed::Result<()> {
         let mut wtxn = self.env.write_txn()?;
         self.db
             .put_with_flags(&mut wtxn, PutFlags::NO_OVERWRITE, &normalise(username), &id)?;
         wtxn.commit()
     }
 
-    pub fn find(&self, username: &str) -> heed::Result<Option<u64>> {
+    pub fn find_by_username(&self, username: &str) -> heed::Result<Option<u64>> {
         let rtxn = self.env.read_txn()?;
         self.db.get(&rtxn, &normalise(username))
     }

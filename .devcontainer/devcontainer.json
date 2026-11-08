@@ -1,0 +1,11 @@
+{
+  "name": "Rust Dev Environment",
+  "image": "mcr.microsoft.com/devcontainers/rust:1",
+  "workspaceFolder": "/workspace",
+  "customizations": {
+    "jetbrains": {
+      "backend": "RustRover"
+    }
+  },
+  "postCreateCommand": "cargo --version"
+}
